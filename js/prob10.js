@@ -6,48 +6,53 @@
 # Find the sum of all the primes below two million.
 */
 
-var primes = [2];
-
-// Hacky brute-force solution :(
-
-// Returns whether a number is prime
-var isPrime = function (num) {	
-	
-	// check whether we've already calculated it
-	if (primes.indexOf(num) > -1) {
-		return true;
-	}
-	
-	// does it have a prime as a factor?
-	for (i = 0; i < primes.length; i++) {
-		if (num % primes[i] === 0) {
-			return false;
-		}
-	}
-	
-	// it's not a previously-discovered prime, and no prime factors
-	var lower = primes[primes.length - 1],
-		upper = Math.floor(num/2);	
-	
-	for (var i = lower; i < upper; i+=2) {
-		if (num % i === 0) {
-			return false;
-		}
-	}
-	//console.log('is Prime: ', num);
-	return true;
+// Sieve of Eratosthenes
+// Returns an array of all primes < num
+var sieve = function (num) {
+    // Seed the list to start
+    this._list = [];
+    for (var i = 2; i <= num; i++) {
+        this._list.push(i);
+    }
+    
+    var lower = 0;
+    var upper = Math.floor(Math.sqrt(num));  
+    
+    // traverse the list
+    for (var i = 0; i < upper; i++) {
+        lower = this._list[i]; // grab the lowest (possible) prime
+        
+        if (this._list[i]) {
+            for (var j=i+1; j < num; j++){
+                if (this._list[j] % lower === 0) {
+                    this._list[j] = false; // cross it out
+                }
+            }
+        }
+        
+    }
+    
+    var primes = [];
+    this._list.map(function(val){
+        if (val) {
+            primes.push(val);
+        }
+    });
+    
+    return primes;
 };
 
-function calculate() {
-	var sum = 0;
+
+function calculate(num) {
+    
 	// first find all the primes below 2 million
-	for (var i = 2; i < 2000000; i++) {
-		if (isPrime(i)) {
-			primes.push(i);
-			sum += i;
-			console.log(sum);
-		}
-	}
+    var primes = sieve(num);
+    
+    var sum = 0;
+    
+    primes.map(function(val){
+        sum += val;       
+    });
 	
-	return sum; // 142913828922 // ugh, this took like 10 minutes. How do we optimize this?
+	return sum; // 142913828922
 }
